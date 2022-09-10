@@ -1,7 +1,5 @@
 #!/bin/bash
-#until [[ -f /var/lib/cloud/instance/boot-finished ]]; do
-#  sleep 1
-#done
+sleep 1m
 sudo yum install git -y
 sudo yum install httpd -y
 sudo systemctl start httpd
