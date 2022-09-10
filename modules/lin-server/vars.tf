@@ -7,3 +7,4 @@ variable "vpc_id" {}
 variable "inst-sg" {}
 variable "vol_size" {}
 variable "ebs_optimized" {}
+variable "depends" {}

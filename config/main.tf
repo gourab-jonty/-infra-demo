@@ -35,6 +35,7 @@ module "Linux-Server" {
   vpc_id           = module.Data.vpc_id
   vol_size         = var.ec2_size
   ebs_optimized    = var.ebs_optimized
+  depends          = module.Network
 }
 
 #########
