@@ -29,7 +29,7 @@ resource "aws_instance" "lin-EC2" {
       "export JAVA_HOME=(/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.322.b06-2.el8_5.x86_64/jre)",
       "mkdir ~/jenkins",
       "sudo yum install openssh-server -y",
-      "systemctl start httpd"
+      "sudo service httpd start"
     ]
   }
 
