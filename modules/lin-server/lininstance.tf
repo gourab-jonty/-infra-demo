@@ -15,13 +15,22 @@ resource "aws_instance" "lin-EC2" {
     volume_size           = var.vol_size
     delete_on_termination = true
   }
-  provisioner "file" {
+  /*provisioner "file" {
     source      = "${path.module}/script/scripts.sh"
     destination = "/home/ec2-user/scripts.sh"
-  }
+  }*/
   provisioner "remote-exec" {
     inline = [
-      "sh scripts.sh"
+      "sudo su",
+      "yum update -y",
+      "yum install git -y",
+      "yum install httpd -y",
+      "yum install java -y",
+      "yum install java-devel -y",
+      "export JAVA_HOME=(/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.322.b06-2.el8_5.x86_64/jre)",
+      "mkdir ~/jenkins",
+      "yum install openssh-server -y"
+      "systemctl start httpd"
     ]
   }
 
