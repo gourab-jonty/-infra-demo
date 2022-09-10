@@ -1,7 +1,6 @@
 resource "aws_instance" "lin-EC2" {
   count = var.instance_count
   ami   = var.linAMI
-  #ami ="ami-06489866022e12a14"
   instance_type        = var.instance_type
   iam_instance_profile = var.instance-profile
   subnet_id            = element(var.subnet_ids, count.index)
@@ -16,11 +15,22 @@ resource "aws_instance" "lin-EC2" {
     volume_size           = var.vol_size
     delete_on_termination = true
   }
-  provisioner "remote-exec" {
+  user_data = <<EOF
+      sudo yum install git -y
+      sudo yum install httpd -y
+      sudo systemctl start httpd
+      EOF
+  
+  /*provisioner "remote-exec" {
     inline = [
       "sudo yum install git -y",
       "sudo yum install httpd -y",
-      "sudo systemctl start httpd",
+      "sudo systemctl start httpd"
+    ]
+  }*/
+
+  provisioner "remote-exec" {
+    inline = [
       "sudo yum install java -y",
       "sudo yum install java-devel -y",
       "export JAVA_HOME=(/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.322.b06-2.el8_5.x86_64/jre)",
@@ -29,6 +39,8 @@ resource "aws_instance" "lin-EC2" {
       "pwd"
     ]
   }
+
+
   connection {
     type        = "ssh"
     user        = "ec2-user"
