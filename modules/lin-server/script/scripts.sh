@@ -1,5 +1,6 @@
 #!/bin/bash
-sleep 1m
+sleep 1000
+sudo yum update -y
 sudo yum install git -y
 sudo yum install httpd -y
 sudo systemctl start httpd
