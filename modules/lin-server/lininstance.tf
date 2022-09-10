@@ -26,7 +26,7 @@ resource "aws_instance" "lin-EC2" {
       "mkdir ~/jenkins",
       "sudo yum install openssh-server -y",
       "sudo service httpd start",
-      "sudo service httpd status""
+      "sudo service httpd status"
     ]
   }
 
