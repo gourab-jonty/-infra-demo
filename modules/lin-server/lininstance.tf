@@ -21,7 +21,7 @@ resource "aws_instance" "lin-EC2" {
   }
   provisioner "remote-exec" {
     inline = [
-      "scripts.sh"
+      "sh scripts.sh"
     ]
   }
 
