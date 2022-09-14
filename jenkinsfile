@@ -1,0 +1,103 @@
+pipeline{
+    agent any
+    tools {
+        terraform 'terraform'
+    }
+    stages{
+        stage('Getting Code'){
+            steps{
+                git branch: 'main', credentialsId: 'github', url: 'https://github.com/gourab-jonty/-infra-demo.git'
+            }
+        }
+        stage('Terraform Init'){
+            steps{
+                dir('config'){
+                     bat 'terraform init -backend-config="terraform.backend"'
+                }
+               
+            }
+        }
+        stage('Generating DB Password'){
+            steps{
+                dir('db-pwd'){
+                    bat 'terraform init -backend-config="terraform.backend"'
+                    bat 'terraform apply -auto-approve'
+            }}
+        }
+        stage('Terraform Plan'){
+            steps{
+               dir('config'){
+                bat 'terraform plan -var-file="terraform.tfvars" -out=plan.txt'
+            }}
+        }
+        stage('Apply-Approval') {
+            steps {
+                script {
+                    def userInput = input(id: 'confirm', message: 'Apply Terraform?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Apply terraform', name: 'confirm'] ])
+                }
+            }
+        }
+        stage('Creating Resources'){
+            steps{
+                dir('config'){
+                bat 'terraform apply -var-file="terraform.tfvars" -auto-approve'
+            }}
+        }
+        stage('Deploy Website Approval') {
+            steps {
+                script {
+                    def userInput = input(id: 'confirm', message: 'Deploy Website?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Deploy Website', name: 'confirm'] ])
+                }
+            }
+        }
+        stage('Getting Website Code' ){
+            steps{
+                git credentialsId: 'github', url: 'https://github.com/gourab-jonty/demo-website.git'
+            }
+        }
+        stage('Deploy Website Slave-1'){
+            agent {
+                label 'Slave-1'
+            }
+            steps{
+                sh 'sudo rm -rf /var/www/html/*'
+                sh 'sudo rm -rf /var/www/html/.git'
+                sh 'sudo git clone https://github.com/gourab-jonty/demo-website.git /var/www/html'
+            }
+        }
+        stage('Deploy Website Slave-2'){
+            agent {
+                label 'Slave-2'
+            }
+            steps{
+                sh 'sudo rm -rf /var/www/html/*'
+                sh 'sudo rm -rf /var/www/html/.git'
+                sh 'sudo git clone https://github.com/gourab-jonty/demo-website.git /var/www/html'
+            }
+        }
+        stage('Destroy-Approval') {
+            steps {
+                script {
+                    def userInput = input(id: 'confirm', message: 'Destroy Terraform?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Destroy terraform', name: 'confirm'] ])
+                }
+            }
+        }
+        stage('Getting Terraform'){
+            steps{
+                git branch: 'main', credentialsId: 'github', url: 'https://github.com/gourab-jonty/-infra-demo.git'
+            }
+        }
+        stage('Terraform Destroy'){
+            steps{
+                dir('config'){
+                    bat 'terraform init -backend-config="terraform.backend"'
+                    bat 'terraform destroy -auto-approve'
+            }
+            dir('db-pwd'){
+                    bat 'terraform init -backend-config="terraform.backend"'
+                    bat 'terraform destroy -auto-approve'
+            }
+        }
+    }}
+}
+
